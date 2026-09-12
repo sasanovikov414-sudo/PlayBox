@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS5 Web Shell</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0c1424;
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* --- ЭКРАН ЗАПУСКА (ИНТРО) --- */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeOutBoot 1s ease 4s forwards;
+        }
+
+        .boot-logo {
+            font-size: 60px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: #fff;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: bootAnim 3.5s ease forwards;
+            text-shadow: 0 0 20px rgba(0, 112, 243, 0.8);
+        }
+
+        @keyframes bootAnim {
+            0% { opacity: 0; transform: scale(0.7); }
+            30% { opacity: 1; transform: scale(1); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.1); }
+        }
+
+        @keyframes fadeOutBoot {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* --- ГЛАВНАЯ ОБОЛОЧКА --- */
+        #shell-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #091526 0%, #152238 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 60px;
+            opacity: 0;
+            animation: fadeInShell 1s ease 4s forwards;
+        }
+
+        @keyframes fadeInShell {
+            to { opacity: 1; }
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-tab {
+            opacity: 0.6;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-tab.active {
+            opacity: 1;
+            border-bottom: 2px solid #0070f3;
+            padding-bottom: 5px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #0070f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,112,243,0.5);
+        }
+
+        /* Центр: Игры (Плитки) */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .game-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .games-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .game-card {
+            width: 180px;
+            height: 260px;
+            background: #1c2a42;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 15px;
+        }
+
+        .game-card.focused {
+            transform: scale(1.1);
+            border-color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 112, 243, 0.6);
+            z-index: 10;
+        }
+
+        .game-card img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .game-card span {
+            position: relative;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Низ: Панель подсказок */
+        .bottom-bar {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .button-hint span {
+            background: #fff;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* --- ОКНО НАСТРОЕК --- */
+        #settings-screen {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: #0c1424;
+            z-index: 1000;
+            display: flex;
+            transition: left 0.4s cubic-bezier(0.1, 1, 0.1, 1);
+            padding: 60px;
+        }
+
+        #settings-screen.open {
+            left: 0;
+        }
+
+        .settings-sidebar {
+            width: 300px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding-right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .settings-menu-item {
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .settings-menu-item.focused {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #0070f3;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding-left: 50px;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .settings-panel h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        .setting-option {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-option.focused {
+            background: rgba(0, 112, 243, 0.2);
+            border: 1px solid #0070f3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Анимация запуска (интро) -->
+    <div id="boot-screen">
+        <div class="boot-logo">PlayStation</div>
+    </div>
+
+    <!-- Главная оболочка -->
+    <div id="shell-container">
+        <div class="top-bar">
+            <div class="nav-tabs">
+                <div class="nav-tab active">Игры</div>
+                <div class="nav-tab">Медиа</div>
+            </div>
+            <div class="user-profile">
+                <span>Игрок №1</span>
+                <div class="avatar">P5</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="game-title" id="active-game-title">Cyberpunk 2077</div>
+            <div class="games-row" id="games-row">
+                <div class="game-card focused" data-title="Cyberpunk 2077">
+                    <span>Cyberpunk</span>
+                </div>
+                <div class="game-card" data-title="God of War Ragnarok">
+                    <span>God of War</span>
+                </div>
+                <div class="game-card" data-title="Spider-Man 2">
+                    <span>Spider-Man 2</span>
+                </div>
+                <div class="game-card" data-title="Настройки системы" id="settings-card">
+                    <span>⚙️ Настройки</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="button-hint"><span>X</span> Выбрать</div>
+            <div class="button-hint"><span>Options</span> Меню</div>
+        </div>
+    </div>
+
+    <!-- Окно настроек -->
+    <div id="settings-screen">
+        <div class="settings-sidebar">
+            <h2>Параметры</h2>
+            <div class="settings-menu-item focused" data-panel="acc">Учетная запись</div>
+            <div class="settings-menu-item" data-panel="pad">Настройки джойстика</div>
+            <div class="settings-menu-item" data-panel="system">Система</div>
+            <div class="settings-menu-item" data-panel="back">← Назад в меню</div>
+        </div>
+        <div class="settings-content">
+            <!-- Учетная запись -->
+            <div class="settings-panel active" id="panel-acc">
+                <h2>Учетная запись</h2>
+                <div class="setting-option focused">Профиль: <b>Player_One_PS5</b></div>
+                <div class="setting-option">Статус сети: В сети</div>
+                <div class="setting-option">Управление подпиской PS Plus</div>
+            </div>
+            <!-- Настройки джойстика -->
+            <div class="settings-panel" id="panel-pad">
+                <h2>Настройки джойстика</h2>
+                <div class="setting-option focused">Вибрация: Сильная (DualSense)</div>
+                <div class="setting-option">Эффект триггеров: Включен</div>
+                <div class="setting-option">Яркость индикатора: Средняя</div>
+            </div>
+            <!-- Система -->
+            <div class="settings-panel" id="panel-system">
+                <h2>Система</h2>
+                <div class="setting-option focused">Язык системы: Русский</div>
+                <div class="setting-option">Дата и время</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Управление с клавиатуры (Стрелки, Enter)
+        let currentScreen = 'main'; // 'main' или 'settings'
+        let selectedGameIndex = 0;
+        let selectedSettingIndex = 0;
+        
+        const games = document.querySelectorAll('.game-card');
+        const activeGameTitle = document.getElementById('active-game-title');
+        const settingsScreen = document.getElementById('settings-screen');
+        const settingItems = document.querySelectorAll('.settings-menu-item');
+        const settingsPanels = document.querySelectorAll('.settings-panel');
+
+        function updateMainFocus() {
+            games.forEach((card, idx) => {
+                if (idx === selectedGameIndex) {
+                    card.classList.add('focused');
+                    activeGameTitle.textContent = card.getAttribute('data-title');
+                } else {
+                    card.classList.remove('focused');
+                }
+            });
+        }
+
+        function updateSettingsFocus() {
+            settingItems.forEach((item, idx) => {
+                if (idx === selectedSettingIndex) {
+                    item.classList.add('focused');
+                    const panelId = item.getAttribute('data-panel');
+                    settingsPanels.forEach(p => p.classList.remove('active'));
+                    if(panelId !== 'back') {
+                        document.getElementById('panel-' + panelId).classList.add('active');
+                    }
+                } else {
+                    item.classList.remove('focused');
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            // Если интро еще идет, блокируем управление
+            if (document.getElementById('boot-screen').style.visibility === 'hidden' == false && Date.now() - window.performance.timing.navigationStart < 4000) {
+                return;
+            }
+
+            if (currentScreen === 'main') {
+                if (e.key === 'ArrowRight') {
+                    selectedGameIndex = (selectedGameIndex + 1) % games.length;
+                    updateMainFocus();
+                } else if (e.key === 'ArrowLeft') {
+                    selectedGameIndex = (selectedGameIndex - 1 + games.length) % games.length;
+                    updateMainFocus();
+                } else if (e.key === 'Enter') {
+                    // Если выбрана плитка настроек
+                    if (games[selectedGameIndex].id === 'settings-card') {
+                        currentScreen = 'settings';
+                        settingsScreen.classList.add('open');
+                        selectedSettingIndex = 0;
+                        updateSettingsFocus();
+                    }
+                }
+            } else if (currentScreen === 'settings') {
+                if (e.key === 'ArrowDown') {
+                    selectedSettingIndex = (selectedSettingIndex + 1) % settingItems.length;
+                    updateSettingsFocus();
+                } else if (e.key === 'ArrowUp') {
+                    selectedSettingIndex = (selectedSettingIndex - 1 + settingItems.length) % settingItems.length;
+                    updateSettingsFocus();
+                } else if (e.key === 'Enter') {
+                    const targetPanel = settingItems[selectedSettingIndex].getAttribute('data-panel');
+                    if (targetPanel === 'back') {
+                        currentScreen = 'main';
+                        settingsScreen.classList.remove('open');
+                    }
+                } else if (e.key === 'Escape' || e.key === 'ArrowLeft') {
+                    currentScreen = 'main';
+                    settingsScreen.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
