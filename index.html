@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PlayBox — Твой мир. Твоя станция.</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --panel-bg: rgba(16, 24, 38, 0.85);
+            --panel-border: rgba(0, 242, 254, 0.25);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --accent: #ff007f;
+            --text-main: #ffffff;
+            --text-muted: #8a99ad;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(79, 172, 254, 0.08) 0%, transparent 50%);
+        }
+
+        /* Шапка */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            width: 100%;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: #030712;
+        }
+
+        .menu-tabs {
+            display: flex;
+            gap: 16px;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--text-main);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .icon-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.92);
+        }
+
+        .icon-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Карусель игр */
+        .carousel-container {
+            padding: 8px 20px;
+            overflow-x: auto;
+            display: flex;
+            gap: 10px;
+            scrollbar-width: none;
+            flex-shrink: 0;
+        }
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .game-card, .add-game-card {
+            min-width: 70px;
+            height: 95px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: #111827;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .game-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+            transform: scale(1.03);
+        }
+
+        .game-card .badge-q {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .add-game-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            gap: 4px;
+        }
+
+        .add-game-card:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .add-game-card svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .add-game-card span {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Рабочая зона */
+        .main-content {
+            flex: 1;
+            padding: 10px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow-y: auto;
+        }
+
+        .hero-section {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 18px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+
+        .hero-tag {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.8px;
+        }
+
+        .hero-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .hero-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #030712;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .btn-secondary-icon {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Модальные окна */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0b1120;
+            border: 1px solid var(--panel-border);
+            width: 100%;
+            max-width: 340px;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            background: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        #filePicker {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="file" id="filePicker" accept=".apk,.zip,.html,.js,image/*" onchange="loadDeviceFile(event)">
+
+    <header>
+        <div class="nav-left">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <span>PlayBox</span>
+            </div>
+            <div class="menu-tabs">
+                <button class="tab active" onclick="switchTab('games', this)">Игры</button>
+                <button class="tab" onclick="switchTab('media', this)">Медиа</button>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="icon-btn" onclick="openSearchModal()" title="Поиск">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Настройки">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </button>
+            <div class="profile-avatar" onclick="openProfileModal()" title="Профиль Google / Sega">S</div>
+        </div>
+    </header>
+
+    <div class="carousel-container" id="gameCarousel">
+        <div class="add-game-card" onclick="triggerDevicePicker()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Своя игра</span>
+        </div>
+        <div class="game-card active" onclick="selectGame(0, 'Assassin\'s Creed Nexus', 'Исследуйте тайны древних цивилизаций и станьте мастером скрытных убийств.')">
+            <div class="badge-q">?</div>
+        </div>
+        <div class="game-card" onclick="selectGame(1, 'Spider-Man 2', 'Почувствуйте динамику полетов на паутине в открытом мире Нью-Йорка.')">
+            <div class="badge-q">?</div>
+        </div>
+        <div class="game-card" onclick="selectGame(2, 'God of War Ragnarök', 'Эпическое путешествие Кратоса и Атрея по девяти мирам.')">
+            <div class="badge-q">?</div>
+        </div>
+        <div class="game-card" onclick="selectGame(3, 'Red Dead Redemption II', 'Шедевр о закате эпохи Дикого Запада.')">
+            <div class="badge-q">?</div>
+        </div>
+        <div class="game-card" onclick="selectGame(4, 'Forza Horizon 5', 'Безумные гонки и сотни суперкаров на просторах Мексики.')">
+            <div class="badge-q">?</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="hero-section">
+            <div class="hero-tag" id="heroTag">Cloud Gaming Hub</div>
+            <div class="hero-title" id="heroTitle">Assassin's Creed Nexus</div>
+            <div class="hero-desc" id="heroDesc">Исследуйте тайны древних цивилизаций и станьте мастером скрытных убийств.</div>
+            <div class="hero-actions">
+                <button class="btn-primary" onclick="launchActiveGame()">Играть сейчас</button>
+                <button class="btn-secondary-icon" onclick="openOptionsModal()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal" id="appModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modalTitle">Уведомление</span>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalText">Текст</div>
+            <div id="modalExtra"></div>
+            <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            if(tab === 'media') {
+                document.getElementById('heroTag').innerText = 'Streaming Center';
+                document.getElementById('heroTitle').innerText = 'Мультимедиа и Стримы';
+                document.getElementById('heroDesc').innerText = 'Просмотр фильмов, видео и облачных трансляций в высоком качестве.';
+            } else {
+                selectGame(0, 'Assassin\'s Creed Nexus', 'Исследуйте тайны древних цивилизаций и станьте мастером скрытных убийств.');
+            }
+        }
+
+        function selectGame(idx, title, desc) {
+            document.querySelectorAll('.game-card').forEach((c, i) => {
+                if(i === idx) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+            document.getElementById('heroTag').innerText = 'Cloud Gaming Hub';
+            document.getElementById('heroTitle').innerText = title;
+            document.getElementById('heroDesc').innerText = desc;
+        }
+
+        function triggerDevicePicker() {
+            document.getElementById('filePicker').click();
+        }
+
+        function loadDeviceFile(event) {
+            const file = event.target.files[0];
+            if(file) {
+                document.getElementById('heroTag').innerText = 'Файл с устройства';
+                document.getElementById('heroTitle').innerText = file.name;
+                document.getElementById('heroDesc').innerText = 'Пользовательский файл успешно загружен. Готов к запуску на станции.';
+                
+                // Добавляем в карусель
+                const carousel = document.getElementById('gameCarousel');
+                const card = document.createElement('div');
+                card.className = 'game-card active';
+                card.innerHTML = '<div class="badge-q" style="font-size:10px; padding:2px; text-align:center;">ФАЙЛ</div>';
+                card.onclick = () => {
+                    document.getElementById('heroTitle').innerText = file.name;
+                    document.getElementById('heroDesc').innerText = 'Выбран локальный файл с устройства.';
+                };
+                carousel.appendChild(card);
+                showModal('Успешно', 'Игра/файл «' + file.name + '» добавлен в интерфейс PlayBox.');
+            }
+        }
+
+        function launchActiveGame() {
+            const game = document.getElementById('heroTitle').innerText;
+            showModal('Запуск сессии', 'Инициализация графического потока для «' + game + '». Подключение виртуального геймпада...');
+        }
+
+        function openSearchModal() {
+            showModal('Поиск', 'Поиск по каталогу облачных релизов и локальным файлам устройства активен.');
+        }
+
+        function openSettingsModal() {
+            showModal('Системные настройки', '• Контроллер: Готов к сопряжению\n• Разрешение: Авто (Adaptive HD)\n• Сервер: Европа-Центр');
+        }
+
+        function openProfileModal() {
+            const extraHtml = `<button class="auth-btn" onclick="googleAuth()">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.1 8.9 5 12 5z"/><path fill="#fff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#fff" d="M5.3 14.7c-.2-.8-.4-1.7-.4-2.7s.2-1.9.4-2.7L1.6 6.4C.6 8.4 0 10.6 0 13s.6 4.6 1.6 6.6l3.7-2.9z"/><path fill="#fff" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5.1L1.6 16C3.5 19.8 7.4 23 12 23z"/></svg>
+                Войти через Google Account
+            </button>`;
+            document.getElementById('modalTitle').innerText = 'Профиль & Облако';
+            document.getElementById('modalText').innerText = 'Управление аккаунтом PlayBox Cloud. Привяжите Google-аккаунт для синхронизации сохранений и достижений.';
+            document.getElementById('modalExtra').innerHTML = extraHtml;
+            document.getElementById('appModal').classList.add('open');
+        }
+
+        function googleAuth() {
+            alert('Google Аккаунт успешно привязан! Синхронизация облака активирована.');
+            closeModal();
+        }
+
+        function openOptionsModal() {
+            showModal('Параметры', 'Доступно:\n• Создать ярлык на рабочем столе\n• Проверить обновления ядра\n• Настроить геймпад');
+        }
+
+        function showModal(title, text) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalText').innerText = text;
+            document.getElementById('modalExtra').innerHTML = '';
+            document.getElementById('appModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('appModal').classList.remove('open');
+        }
+    </style>
+</body>
+</html>
+
