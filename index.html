@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PlayBox - Ultimate Web Gaming Hub</title>
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --panel-bg: rgba(16, 24, 38, 0.75);
+            --panel-border: rgba(0, 242, 254, 0.2);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --accent: #ff007f;
+            --text-main: #ffffff;
+            --text-muted: #8a99ad;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 127, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(8, 12, 20, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--panel-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: #000;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(16, 24, 38, 0.9), rgba(8, 12, 20, 0.9)), url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80') center/cover;
+            border-radius: 20px;
+            border: 1px solid var(--panel-border);
+            padding: 50px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.2);
+        }
+
+        .game-thumb {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .game-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .game-genre {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .game-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Modals / Panels */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 7, 12, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #101826;
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            transform: scale(0.9);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .close-btn:hover { color: #fff; }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Settings Tabs inside Modal */
+        .settings-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Mobile Controller Overlay */
+        .virtual-gamepad {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: none;
+            justify-content: space-between;
+            padding: 0 30px;
+            pointer-events: none;
+            z-index: 500;
+        }
+
+        .virtual-gamepad.active {
+            display: flex;
+        }
+
+        .d-pad, .action-buttons {
+            width: 130px;
+            height: 130px;
+            position: relative;
+            pointer-events: auto;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .v-btn {
+            position: absolute;
+            background: rgba(0, 242, 254, 0.2);
+            border: 1px solid var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            backdrop-filter: blur(5px);
+        }
+        .v-btn:active { background: rgba(0, 242, 254, 0.5); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; }
+            .nav-menu { display: none; }
+            .hero-banner { padding: 30px 20px; }
+            .hero-title { font-size: 28px; }
+            .container { padding: 15px; }
+            .virtual-gamepad.active { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area" onclick="switchTab('home')">
+            <div class="logo-icon">🎮</div>
+            <div class="logo-text">PlayBox</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="switchTab('home')">Главная</li>
+            <li class="nav-item" onclick="switchTab('catalog')">Игры</li>
+            <li class="nav-item" onclick="switchTab('emulator')</li>
+            <li class="nav-item" onclick="openModal('settingsModal')">Настройки</li>
+        </ul>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="openModal('addGameModal')">+ Своя игра</button>
+            <button class="btn" onclick="openModal('settingsModal')" id="profileBtn">Профиль</button>
+        </div>
+    </header>
+
+    <div class="container" id="mainContainer">
+        <!-- Home View -->
+        <div id="homeView">
+            <div class="hero-banner">
+                Cloud Gaming Hub
+                <div class="hero-content">
+                    <h1 class="hero-title">Assassin's Creed Nexus</h1>
+                    <p class="hero-desc">Исследуйте тайны древних цивилизаций и станьте легендарным мастером скрытных убийц прямо в браузере без установок.</p>
+                    <button class="btn" onclick="launchGame('Assassin\'s Creed')">Играть сейчас</button>
+                </div>
+            </div>
+
+            <div class="section-title">
+                Популярные релизы
+                <button class="btn btn-secondary" style="font-size: 14px; padding: 6px 14px;" onclick="switchTab('catalog')">Все игры</button>
+            </div>
+
+            <div class="games-grid" id="gamesGrid">
+                <!-- Карточки генерируются скриптом -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Настройки и Аккаунт Модал -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Настройки и Профиль</div>
+                <button class="close-btn" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label class="form-label">Создание / Изменение аккаунта</label>
+                    <input type="text" class="form-input" id="usernameInput" placeholder="Введите ваш никнейм...">
+                </div>
+                <button class="btn" onclick="saveProfile()">Сохранить профиль</button>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="form-label">Кастомизация виртуального джойстика</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="toggleGamepad(true)">Включить джойстик на экране</button>
+                        <button class="btn btn-secondary" onclick="toggleGamepad(false)">Скрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал добавления / запуска сторонней игры -->
+    <div class="modal-overlay" id="addGameModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Запуск игры с устройства</div>
+                <button class="close-btn" onclick="closeModal('addGameModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Выберите HTML-файл или ROM с устройства</label>
+                <input type="file" class="form-input" id="romFileInput" accept=".html,.js,.zip">
+            </div>
+            <button class="btn" onclick="loadCustomGame()">Запустить игру</button>
+        </div>
+    </div>
+
+    <!-- Модал загрузки игры -->
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal-card" style="text-align: center;">
+            <div class="modal-header">
+                <div class="modal-title" id="downloadGameTitle">Загрузка игры</div>
+                <button class="close-btn" onclick="closeModal('downloadModal')">&times;</button>
+            </div>
+            <p id="downloadStatus" style="color: var(--text-muted); margin-bottom: 20px;">Подготовка к скачиванию файлов...</p>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; height: 12px; margin-bottom: 20px;">
+                <div id="progressBar" style="background: var(--primary); width: 0%; height: 100%; transition: width 0.3s;"></div>
+            </div>
+            <button class="btn" id="startDownloadedGameBtn" style="display:none;" onclick="runActiveGame()">Запустить игру</button>
+        </div>
+    </div>
+
+    <!-- Экранный геймпад для телефонов -->
+    <div class="virtual-gamepad" id="virtualGamepad">
+        <div class="d-pad">
+            <div class="v-btn" style="top: 0; left: 45px; width: 40px; height: 40px;" ontouchstart="simulateKey('ArrowUp')" ontouchend="simulateKeyUp('ArrowUp')">▲</div>
+            <div class="v-btn" style="bottom: 0; left: 45px; width: 40px; height: 40px;" ontouchstart="simulateKey('ArrowDown')" ontouchend="simulateKeyUp('ArrowDown')">▼</div>
+            <div class="v-btn" style="top: 45px; left: 0; width: 40px; height: 40px;" ontouchstart="simulateKey('ArrowLeft')" ontouchend="simulateKeyUp('ArrowLeft')">◀</div>
+            <div class="v-btn" style="top: 45px; right: 0; width: 40px; height: 40px;" ontouchstart="simulateKey('ArrowRight')" ontouchend="simulateKeyUp('ArrowRight')">▶</div>
+        </div>
+        <div class="action-buttons">
+            <div class="v-btn" style="bottom: 10px; left: 10px; width: 45px; height: 45px;" ontouchstart="simulateKey('KeyX')" ontouchend="simulateKeyUp('KeyX')">X</div>
+            <div class="v-btn" style="top: 10px; right: 10px; width: 45px; height: 45px;" ontouchstart="simulateKey('KeyZ')" ontouchend="simulateKeyUp('KeyZ')">Z</div>
+        </div>
+    </div>
+
+    <script>
+        const games = [
+            { id: 1, title: "Assassin's Creed", genre: "Экшен / Приключения", bg: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80" },
+            { id: 2, title: "Cyberpunk Runner", genre: "Киберпанк / Шутер", bg: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80" },
+            { id: 3, title: "Speed Horizon", genre: "Гонки / Аркада", bg: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80" },
+            { id: 4, title: "Space Odyssey", genre: "Стратегия / Космос", bg: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" }
+        ];
+
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = games.map(g => `
+                <div class="game-card">
+                    <div class="game-thumb" style="background-image: url('${g.bg}')"></div>
+                    <div class="game-info">
+                        <div>
+                            <div class="game-title">${g.title}</div>
+                            <div class="game-genre">${g.genre}</div>
+                        </div>
+                        <div class="game-card-actions">
+                            <button class="btn" style="flex: 1; padding: 8px;" onclick="launchGame('${g.title}')">Играть</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;" onclick="downloadGame('${g.title}')">📥</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(tab === 'home') {
+                renderGames();
+            } else if(tab === 'catalog') {
+                document.getElementById('gamesGrid').innerHTML = games.map(g => `
+                    <div class="game-card">
+                        <div class="game-thumb" style="background-image: url('${g.bg}')"></div>
+                        <div class="game-info">
+                            <div class="game-title">${g.title}</div>
+                            <div class="game-genre">${g.genre}</div>
+                            <button class="btn" onclick="launchGame('${g.title}')" style="margin-top: 10px;">Запустить</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function saveProfile() {
+            const name = document.getElementById('usernameInput').value;
+     
